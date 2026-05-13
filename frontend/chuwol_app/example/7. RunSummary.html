@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHUWOL Run Summary</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+        body {
+            margin: 0; padding: 0; background-color: #000000; color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+
+        .app-container {
+            width: 393px; height: 852px;
+            background-color: #0A0A0A;
+            position: relative; display: flex; flex-direction: column; box-sizing: border-box;
+            overflow-y: auto; /* 내용이 많을 경우 스크롤 가능 */
+        }
+
+        /* 1. 상단 네비게이션 및 날짜 */
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 50px 24px 15px 24px; border-bottom: 1px solid #222;
+        }
+        .header-title { display: flex; flex-direction: column; }
+        .date-text { font-size: 12px; color: #888; font-weight: 600; margin-bottom: 4px; }
+        .run-title { font-size: 18px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
+        .icon-btn { font-size: 20px; cursor: pointer; color: #fff; }
+
+        /* 2. 추월 성공 팝업 배너 (게이미피케이션) */
+        .success-banner {
+            margin: 20px 24px 10px 24px; padding: 15px; border-radius: 12px;
+            background: rgba(204, 255, 0, 0.1); border: 1px solid #CCFF00;
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 0 15px rgba(204, 255, 0, 0.1);
+        }
+        .banner-icon { font-size: 24px; }
+        .banner-text { display: flex; flex-direction: column; gap: 2px; }
+        .banner-title { font-size: 14px; font-weight: 900; color: #CCFF00; letter-spacing: -0.5px; }
+        .banner-sub { font-size: 11px; font-weight: 600; color: #ccc; }
+
+        /* 3. 메인 기록 (나이키 스타일의 거대한 숫자) */
+        .main-metrics {
+            padding: 20px 24px; display: flex; flex-direction: column;
+        }
+        .dist-value {
+            font-size: 96px; font-weight: 900; font-style: italic; color: #ffffff;
+            line-height: 0.9; letter-spacing: -3px; margin-bottom: 5px; text-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        .dist-label { font-size: 14px; font-weight: 600; color: #888; }
+
+        /* 4. 서브 기록 2x2 그리드 */
+        .grid-metrics {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 0 24px 20px 24px;
+        }
+        .metric-box { display: flex; flex-direction: column; gap: 4px; }
+        .metric-value { font-size: 24px; font-weight: 800; color: #fff; }
+        .metric-label { font-size: 12px; font-weight: 600; color: #888; }
+
+        /* 5. 지도 섹션 (모서리가 둥근 박스 형태) */
+        .map-section {
+            margin: 10px 24px 20px 24px; height: 200px; border-radius: 20px;
+            position: relative; overflow: hidden; border: 1px solid #333;
+        }
+        .map-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=800&auto=format&fit=crop');
+            background-size: cover; background-position: center; opacity: 0.4;
+        }
+        /* 경로 SVG 및 시작/종료 마커 */
+        .route-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
+        .marker-start { position: absolute; top: 123px; left: 63px; width: 14px; height: 14px; background: #fff; border: 3px solid #CCFF00; border-radius: 50%; z-index: 3; box-shadow: 0 0 10px #CCFF00; }
+        .marker-end { position: absolute; top: 33px; left: 243px; width: 14px; height: 14px; background: #fff; border: 3px solid #FF4444; border-radius: 50%; z-index: 3; box-shadow: 0 0 10px #FF4444; }
+
+        /* 6. 구간별 페이스 (Splits) */
+        .splits-section {
+            padding: 0 24px 30px 24px;
+        }
+        .splits-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .split-row { display: flex; align-items: center; margin-bottom: 12px; }
+        .split-km { width: 40px; font-size: 14px; font-weight: 700; color: #888; }
+        .split-bar-container { flex-grow: 1; height: 30px; display: flex; align-items: center; }
+        /* 막대 그래프 길이로 페이스 시각화 */
+        .split-bar { height: 100%; background-color: #222; border-radius: 4px; display: flex; align-items: center; padding-left: 10px; font-size: 13px; font-weight: 700; color: #fff; }
+        .split-bar.fastest { background-color: rgba(204, 255, 0, 0.2); color: #CCFF00; border: 1px solid #CCFF00; }
+        .split-elev { width: 50px; text-align: right; font-size: 12px; font-weight: 600; color: #888; }
+
+        /* 7. 하단 고정 공유 버튼 */
+        .share-btn-container {
+            padding: 0 24px 30px 24px; margin-top: auto;
+        }
+        .btn-share {
+            width: 100%; height: 60px; border-radius: 16px; background-color: #CCFF00; color: #000;
+            display: flex; justify-content: center; align-items: center; font-size: 16px; font-weight: 800; cursor: pointer; border: none;
+            box-shadow: 0 4px 15px rgba(204, 255, 0, 0.3); gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        
+        <div class="header">
+            <div class="icon-btn">🔙</div>
+            <div class="header-title">
+                <div class="date-text">오늘 - 오전 06:12</div>
+                <div class="run-title">아침 추월 러닝 ✏️</div>
+            </div>
+            <div class="icon-btn">⋯</div>
+        </div>
+
+        <div class="success-banner">
+            <div class="banner-icon">🏆</div>
+            <div class="banner-text">
+                <div class="banner-title">민수님 추월 완료!</div>
+                <div class="banner-sub">골드 티어 2위로 올라섰습니다. 🔥43일 연속!</div>
+            </div>
+        </div>
+
+        <div class="main-metrics">
+            <div class="dist-value">3.24</div>
+            <div class="dist-label">킬로미터</div>
+        </div>
+
+        <div class="grid-metrics">
+            <div class="metric-box">
+                <div class="metric-value">5'28"</div>
+                <div class="metric-label">평균 페이스</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-value">17:42</div>
+                <div class="metric-label">시간</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-value">28 m</div>
+                <div class="metric-label">고도 상승</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-value">210</div>
+                <div class="metric-label">칼로리</div>
+            </div>
+        </div>
+
+        <div class="map-section">
+            <div class="map-bg"></div>
+            <svg class="route-svg" viewBox="0 0 345 200" preserveAspectRatio="none">
+                <polyline points="70,130 120,100 180,120 250,40" 
+                          fill="none" stroke="#CCFF00" stroke-width="5" 
+                          stroke-linecap="round" stroke-linejoin="round"
+                          style="filter: drop-shadow(0 0 5px #CCFF00);" />
+            </svg>
+            <div class="marker-start"></div>
+            <div class="marker-end"></div>
+        </div>
+
+        <div class="splits-section">
+            <div class="splits-title">구간 기록</div>
+            
+            <div class="split-row">
+                <div class="split-km">1</div>
+                <div class="split-bar-container">
+                    <div class="split-bar" style="width: 75%;">5'42"</div>
+                </div>
+                <div class="split-elev">-2 m</div>
+            </div>
+            
+            <div class="split-row">
+                <div class="split-km">2</div>
+                <div class="split-bar-container">
+                    <div class="split-bar fastest" style="width: 60%;">5'15"</div> </div>
+                <div class="split-elev">4 m</div>
+            </div>
+
+            <div class="split-row">
+                <div class="split-km">3</div>
+                <div class="split-bar-container">
+                    <div class="split-bar" style="width: 70%;">5'30"</div>
+                </div>
+                <div class="split-elev">1 m</div>
+            </div>
+            
+            <div class="split-row">
+                <div class="split-km">0.24</div>
+                <div class="split-bar-container">
+                    <div class="split-bar" style="width: 65%;">5'20"</div>
+                </div>
+                <div class="split-elev">-1 m</div>
+            </div>
+        </div>
+
+        <div class="share-btn-container">
+            <button class="btn-share">
+                📸 추월 기록 인스타그램에 공유하기
+            </button>
+        </div>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHUWOL Records & Statistics</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+        body {
+            margin: 0; padding: 0; background-color: #000000; color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden;
+        }
+
+        .app-container {
+            width: 393px; height: 852px;
+            background: linear-gradient(180deg, #0A0A0A 0%, #111111 100%);
+            position: relative; display: flex; flex-direction: column; box-sizing: border-box;
+        }
+
+        /* 미세한 왼쪽 사선 패턴 */
+        .bg-pattern {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0.15;
+            background-image: repeating-linear-gradient(-45deg, #444444, #444444 1px, transparent 1px, transparent 8px);
+            pointer-events: none;
+        }
+
+        /* 상단 헤더 */
+        .header {
+            padding: 60px 24px 20px 24px; position: relative; z-index: 10;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .header-title { font-size: 20px; font-weight: 900; font-style: italic; letter-spacing: 1px; color: #CCFF00; }
+        .icon-btn { font-size: 24px; color: #fff; cursor: pointer; }
+
+        /* 월간 선택바 */
+        .month-selector {
+            padding: 0 24px 20px 24px; display: flex; align-items: center; justify-content: center; gap: 20px; position: relative; z-index: 10;
+        }
+        .current-month { font-size: 18px; font-weight: 700; color: #fff; }
+        .arrow-btn { font-size: 14px; color: #888; cursor: pointer; }
+
+        /* 메인 기록 영역 (스크롤 가능) */
+        .scroll-section {
+            flex-grow: 1; overflow-y: auto; padding: 0 24px 100px 24px; position: relative; z-index: 10;
+            display: flex; flex-direction: column; gap: 30px;
+        }
+
+        /* 1. 요약 통계 그리드 */
+        .stats-summary {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
+        }
+        .stat-card {
+            background-color: #1A1A1A; border: 1px solid #333; border-radius: 16px; padding: 15px 10px;
+            text-align: center; display: flex; flex-direction: column; gap: 5px;
+        }
+        .stat-val { font-size: 20px; font-weight: 900; font-style: italic; color: #CCFF00; }
+        .stat-lbl { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; }
+
+        /* 2. 메인 캘린더 (연속성 강조) */
+        .calendar-container {
+            background-color: #1A1A1A; border: 1px solid #333; border-radius: 20px; padding: 20px;
+        }
+        .calendar-grid {
+            display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; text-align: center;
+        }
+        .calendar-day-lbl { font-size: 11px; font-weight: 700; color: #555; margin-bottom: 10px; }
+        .day-cell {
+            aspect-ratio: 1; display: flex; justify-content: center; align-items: center;
+            font-size: 13px; font-weight: 700; border-radius: 50%; position: relative; color: #555;
+        }
+        /* 성공한 날 (불꽃 배경) */
+        .day-cell.success {
+            background-color: rgba(204, 255, 0, 0.15); color: #CCFF00;
+            box-shadow: 0 0 10px rgba(204, 255, 0, 0.1);
+        }
+        .day-cell.success::after {
+            content: '🔥'; position: absolute; bottom: -2px; font-size: 8px;
+        }
+        /* 오늘 */
+        .day-cell.today { border: 1px solid #CCFF00; color: #fff; }
+
+        /* 3. 활동 로그 (최근 활동) */
+        .history-section { display: flex; flex-direction: column; gap: 15px; }
+        .section-title { font-size: 16px; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 8px; }
+        .history-item {
+            display: flex; align-items: center; background-color: #1A1A1A; border-radius: 16px; padding: 16px; gap: 15px;
+        }
+        .history-date {
+            width: 45px; text-align: center; display: flex; flex-direction: column; gap: 2px;
+        }
+        .h-day { font-size: 16px; font-weight: 900; color: #fff; }
+        .h-month { font-size: 10px; font-weight: 700; color: #666; text-transform: uppercase; }
+        
+        .history-info { flex-grow: 1; display: flex; flex-direction: column; gap: 4px; }
+        .h-title { font-size: 14px; font-weight: 700; color: #fff; }
+        .h-stats { font-size: 12px; color: #888; display: flex; gap: 8px; }
+        .h-stats span { color: #CCFF00; font-weight: 700; }
+        
+        .history-overtake {
+            font-size: 11px; font-weight: 800; color: #000; background-color: #CCFF00;
+            padding: 4px 8px; border-radius: 6px; transform: rotate(-2deg);
+        }
+
+        /* 하단 네비게이션 바 (기록 탭 활성화) */
+        .bottom-nav {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 85px;
+            background-color: rgba(10, 10, 10, 0.9); backdrop-filter: blur(10px);
+            border-top: 1px solid #222222; display: flex; justify-content: space-around; align-items: center; padding-bottom: 15px; box-sizing: border-box; z-index: 100;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #666666; cursor: pointer; }
+        .nav-item.active { color: #CCFF00; }
+        .nav-icon { font-size: 24px; }
+        .nav-text { font-size: 11px; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="bg-pattern"></div>
+        
+        <div class="header">
+            <div class="header-title">MY RECORDS</div>
+            <div class="icon-btn">📊</div>
+        </div>
+
+        <div class="month-selector">
+            <span class="arrow-btn">◀</span>
+            <span class="current-month">April 2026</span>
+            <span class="arrow-btn">▶</span>
+        </div>
+
+        <div class="scroll-section">
+            
+            <div class="stats-summary">
+                <div class="stat-card">
+                    <span class="stat-lbl">Total KM</span>
+                    <span class="stat-val">124.5</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-lbl">Streak</span>
+                    <span class="stat-val">42 Days</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-lbl">Overtakes</span>
+                    <span class="stat-val">12 People</span>
+                </div>
+            </div>
+
+            <div class="calendar-container">
+                <div class="calendar-grid">
+                    <div class="calendar-day-lbl">S</div><div class="calendar-day-lbl">M</div><div class="calendar-day-lbl">T</div>
+                    <div class="calendar-day-lbl">W</div><div class="calendar-day-lbl">T</div><div class="calendar-day-lbl">F</div>
+                    <div class="calendar-day-lbl">S</div>
+                    
+                    <div class="day-cell">29</div><div class="day-cell">30</div><div class="day-cell">31</div>
+                    <div class="day-cell success">1</div><div class="day-cell success">2</div><div class="day-cell success">3</div><div class="day-cell success">4</div>
+                    <div class="day-cell success">5</div><div class="day-cell success">6</div><div class="day-cell success">7</div><div class="day-cell">8</div><div class="day-cell success">9</div><div class="day-cell success">10</div><div class="day-cell success">11</div>
+                    <div class="day-cell success">12</div><div class="day-cell success">13</div><div class="day-cell today">14</div><div class="day-cell">15</div><div class="day-cell">16</div><div class="day-cell">17</div><div class="day-cell">18</div>
+                    <div class="day-cell">19</div><div class="day-cell">20</div><div class="day-cell">21</div><div class="day-cell">22</div><div class="day-cell">23</div><div class="day-cell">24</div><div class="day-cell">25</div>
+                </div>
+            </div>
+
+            <div class="history-section">
+                <div class="section-title"><span>🏃‍♂️</span> 최근 추월 로그</div>
+                
+                <div class="history-item">
+                    <div class="history-date">
+                        <span class="h-day">13</span>
+                        <span class="h-month">Apr</span>
+                    </div>
+                    <div class="history-info">
+                        <div class="h-title">월요일 오전 러닝</div>
+                        <div class="h-stats"><span>5.2km</span> | 28분 12초</div>
+                    </div>
+                    <div class="history-overtake">+2 추월</div>
+                </div>
+
+                <div class="history-item">
+                    <div class="history-date">
+                        <span class="h-day">12</span>
+                        <span class="h-month">Apr</span>
+                    </div>
+                    <div class="history-info">
+                        <div class="h-title">지독한 일요일 야간 러닝</div>
+                        <div class="h-stats"><span>10.0km</span> | 55분 04초</div>
+                    </div>
+                    <div class="history-overtake">+1 추월</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item">
+                <div class="nav-icon">🏠</div>
+                <span class="nav-text">홈</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">🏆</div>
+                <span class="nav-text">랭킹</span>
+            </div>
+            <div class="nav-item active">
+                <div class="nav-icon">📅</div>
+                <span class="nav-text">기록</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">👤</div>
+                <span class="nav-text">프로필</span>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

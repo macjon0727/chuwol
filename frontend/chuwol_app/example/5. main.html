@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHUWOL Main Dashboard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+        body {
+            margin: 0; padding: 0; background-color: #000000; color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden;
+        }
+
+        .app-container {
+            width: 393px; height: 852px;
+            background: linear-gradient(180deg, #0A0A0A 0%, #111111 100%);
+            position: relative; display: flex; flex-direction: column; box-sizing: border-box;
+        }
+
+        /* 상단 헤더 (프로필 & 알림) */
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 50px 24px 20px 24px;
+        }
+        .user-greeting { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .user-avatar { width: 40px; height: 40px; background-color: #333; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; border: 2px solid #CCFF00; }
+        .icon-btn { font-size: 24px; cursor: pointer; }
+
+        /* 핵심 기능 1: 스트릭 (연속 달성) */
+        .streak-section {
+            text-align: center; padding: 20px 24px;
+        }
+        .streak-title { font-size: 14px; color: #888888; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .streak-number {
+            font-size: 64px; font-weight: 900; font-style: italic; color: #CCFF00;
+            text-shadow: 0 0 20px rgba(204, 255, 0, 0.4); margin: -5px 0;
+        }
+        .streak-sub { font-size: 14px; color: #ffffff; font-weight: 600; }
+
+        /* 핵심 기능 3: 추월 게이지 (경쟁 시각화) */
+        .target-section {
+            background-color: #1A1A1A; border-radius: 20px; padding: 20px; margin: 20px 24px;
+            border: 1px solid #2A2A2A; box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+        }
+        .target-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .target-label { font-size: 14px; font-weight: 700; color: #CCFF00; display: flex; align-items: center; gap: 5px; }
+        .target-text { font-size: 13px; color: #888888; }
+        
+        .progress-track {
+            height: 12px; background-color: #333333; border-radius: 6px; position: relative; margin: 30px 0 10px 0;
+        }
+        .progress-fill {
+            position: absolute; top: 0; left: 0; height: 100%; width: 75%;
+            background: linear-gradient(90deg, #668000 0%, #CCFF00 100%); border-radius: 6px;
+            box-shadow: 0 0 10px rgba(204, 255, 0, 0.5);
+        }
+        /* 트랙 위의 캐릭터들 */
+        .runner-me { position: absolute; top: -25px; left: 75%; transform: translateX(-50%); font-size: 20px; filter: drop-shadow(0 0 5px rgba(204,255,0,0.8)); }
+        .runner-target { position: absolute; top: -25px; right: 0; font-size: 20px; opacity: 0.5; }
+
+        /* 핵심 기능 2: 주간 잔디 달력 (미니 캘린더) */
+        .weekly-section {
+            padding: 0 24px; margin-bottom: 30px;
+        }
+        .section-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; }
+        .days-row { display: flex; justify-content: space-between; }
+        .day-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .day-label { font-size: 12px; color: #666666; font-weight: 600; }
+        .day-circle {
+            width: 36px; height: 36px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 700; font-size: 14px;
+        }
+        /* 달성 상태 디자인 */
+        .done { background-color: #CCFF00; color: #000000; box-shadow: 0 0 10px rgba(204, 255, 0, 0.3); }
+        .missed { background-color: #222222; color: #555555; }
+        .today { border: 2px solid #CCFF00; color: #CCFF00; background-color: transparent; }
+
+        /* 핵심 기능 1: 측정 시작 버튼 */
+        .action-section {
+            padding: 0 24px; margin-top: auto; margin-bottom: 100px; /* 네비게이션 바 공간 확보 */
+        }
+        .btn-start {
+            width: 100%; height: 70px; border-radius: 20px; background-color: #CCFF00; color: #000000;
+            display: flex; justify-content: center; align-items: center; font-size: 22px; font-weight: 900; font-style: italic;
+            cursor: pointer; box-shadow: 0 8px 20px rgba(204, 255, 0, 0.4); border: none; letter-spacing: -1px;
+        }
+        .btn-start:active { transform: translateY(3px); box-shadow: 0 4px 10px rgba(204, 255, 0, 0.4); }
+
+        /* 하단 네비게이션 바 */
+        .bottom-nav {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 85px;
+            background-color: rgba(10, 10, 10, 0.9); backdrop-filter: blur(10px);
+            border-top: 1px solid #222222; display: flex; justify-content: space-around; align-items: center; padding-bottom: 15px; box-sizing: border-box;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #666666; cursor: pointer; }
+        .nav-item.active { color: #CCFF00; }
+        .nav-icon { font-size: 24px; }
+        .nav-text { font-size: 11px; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        
+        <div class="header">
+            <div class="user-greeting">
+                <div class="user-avatar">😎</div>
+                지독한러너님
+            </div>
+            <div class="icon-btn">🔔</div>
+        </div>
+
+        <div class="streak-section">
+            <div class="streak-title">CURRENT STREAK</div>
+            <div class="streak-number">42 DAYS</div>
+            <div class="streak-sub">오늘 1km를 뛰어 불꽃을 유지하세요!</div>
+        </div>
+
+        <div class="target-section">
+            <div class="target-header">
+                <div class="target-label">🎯 다음 타겟: 민수</div>
+                <div class="target-text">추월까지 1.2km</div>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill"></div>
+                <div class="runner-me">🏃‍♂️</div>
+                <div class="runner-target">🚶‍♂️</div>
+            </div>
+        </div>
+
+        <div class="weekly-section">
+            <div class="section-title">이번 주 추월 기록</div>
+            <div class="days-row">
+                <div class="day-item"><span class="day-label">월</span><div class="day-circle done">✓</div></div>
+                <div class="day-item"><span class="day-label">화</span><div class="day-circle done">✓</div></div>
+                <div class="day-item"><span class="day-label">수</span><div class="day-circle done">✓</div></div>
+                <div class="day-item"><span class="day-label">목</span><div class="day-circle missed">-</div></div>
+                <div class="day-item"><span class="day-label">금</span><div class="day-circle done">✓</div></div>
+                <div class="day-item"><span class="day-label">토</span><div class="day-circle today">🔥</div></div>
+                <div class="day-item"><span class="day-label">일</span><div class="day-circle missed"></div></div>
+            </div>
+        </div>
+
+        <div class="action-section">
+            <button class="btn-start">CHUWOL 시작하기 💨</button>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active">
+                <div class="nav-icon">🏠</div>
+                <span class="nav-text">홈</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">🏆</div>
+                <span class="nav-text">랭킹</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">📅</div>
+                <span class="nav-text">기록</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">👤</div>
+                <span class="nav-text">프로필</span>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
