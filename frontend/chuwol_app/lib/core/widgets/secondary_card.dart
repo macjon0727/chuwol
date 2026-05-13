@@ -18,14 +18,14 @@ class SecondaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(20),
       child: Ink(
         width: double.infinity,
         padding: padding,
         decoration: BoxDecoration(
           color: AppColors.card,
           border: Border.all(color: AppColors.border),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: child,
       ),

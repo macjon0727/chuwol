@@ -31,7 +31,10 @@ class SecondaryButton extends StatelessWidget {
           side: BorderSide(
             color: danger ? AppColors.redAlert : AppColors.border,
           ),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          backgroundColor: AppColors.card,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
           textStyle: Theme.of(context).textTheme.labelLarge,
         ),
       ),

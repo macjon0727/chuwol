@@ -26,7 +26,11 @@ class PrimaryButton extends StatelessWidget {
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.neonLime,
           foregroundColor: AppColors.black,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          elevation: 0,
+          shadowColor: AppColors.neonLime.withValues(alpha: 0.45),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
           textStyle: Theme.of(context).textTheme.labelLarge,
         ),
       ),

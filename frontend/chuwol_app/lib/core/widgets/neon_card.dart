@@ -12,14 +12,14 @@ class NeonCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(24),
       child: Ink(
         width: double.infinity,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: AppColors.card,
           border: Border.all(color: AppColors.neonLime, width: 1.4),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
               color: AppColors.neonLime.withValues(alpha: 0.2),
