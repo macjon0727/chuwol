@@ -14,6 +14,7 @@ class OnboardingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChuwolScaffold(
       title: 'SETUP RUNNER',
+      backRoute: '/login',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -13,6 +13,7 @@ class InstagramStoryShareScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChuwolScaffold(
       title: 'SHARE',
+      backRoute: '/run-result',
       child: Column(
         children: [
           AspectRatio(

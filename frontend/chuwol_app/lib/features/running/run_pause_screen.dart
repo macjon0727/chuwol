@@ -14,6 +14,7 @@ class RunPauseScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChuwolScaffold(
       title: 'PAUSED',
+      backRoute: '/running',
       child: Column(
         children: [
           const SizedBox(height: 20),

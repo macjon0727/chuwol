@@ -13,6 +13,7 @@ class StreakBrokenShieldUseScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChuwolScaffold(
       title: 'STREAK BROKEN',
+      backRoute: '/home',
       child: Column(
         children: [
           const Icon(

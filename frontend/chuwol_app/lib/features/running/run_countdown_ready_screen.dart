@@ -16,6 +16,7 @@ class RunCountdownReadyScreen extends StatelessWidget {
     return ChuwolScaffold(
       title: 'RUN READY',
       currentRoute: '/run-ready',
+      backRoute: '/home',
       child: Column(
         children: [
           const SizedBox(height: 20),

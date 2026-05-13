@@ -14,6 +14,7 @@ class PermissionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChuwolScaffold(
       title: 'PERMISSIONS',
+      backRoute: '/onboarding',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

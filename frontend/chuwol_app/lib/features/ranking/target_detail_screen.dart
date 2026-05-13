@@ -14,6 +14,7 @@ class TargetDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChuwolScaffold(
       title: 'TARGET DETAIL',
+      backRoute: '/ranking',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

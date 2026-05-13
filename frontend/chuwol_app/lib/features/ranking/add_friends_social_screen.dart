@@ -11,6 +11,7 @@ class AddFriendsSocialScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChuwolScaffold(
       title: 'FRIENDS',
+      backRoute: '/ranking',
       child: Column(
         children: const [
           SecondaryCard(
