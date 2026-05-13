@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHUWOL Ranking</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+        body {
+            margin: 0; padding: 0; background-color: #000000; color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden;
+        }
+
+        .app-container {
+            width: 393px; height: 852px;
+            background: linear-gradient(180deg, #0A0A0A 0%, #111111 100%);
+            position: relative; display: flex; flex-direction: column; box-sizing: border-box;
+        }
+
+        /* 미세한 왼쪽 사선 패턴 */
+        .bg-pattern {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0.15;
+            background-image: repeating-linear-gradient(-45deg, #444444, #444444 1px, transparent 1px, transparent 8px);
+            pointer-events: none;
+        }
+
+        /* 상단 타이틀 */
+        .header {
+            padding: 60px 24px 20px 24px; text-align: center; position: relative; z-index: 1;
+        }
+        .page-title { font-size: 18px; font-weight: 700; letter-spacing: 1px; }
+
+        /* 티어 배너 (골드 티어 강조) */
+        .tier-banner {
+            margin: 0 24px 20px 24px; padding: 25px 20px; border-radius: 20px;
+            background: linear-gradient(135deg, #FFD700 0%, #B8860B 100%);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.2);
+            text-align: center; position: relative; overflow: hidden; z-index: 1;
+        }
+        .tier-icon { font-size: 40px; margin-bottom: 5px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); }
+        .tier-name { font-size: 24px; font-weight: 900; font-style: italic; color: #000; text-transform: uppercase; margin-bottom: 5px; }
+        .tier-info { font-size: 13px; font-weight: 600; color: rgba(0,0,0,0.7); }
+        
+        /* 랭킹 리스트 영역 */
+        .ranking-container {
+            flex-grow: 1; padding: 0 24px; overflow-y: auto; z-index: 1; margin-bottom: 90px;
+        }
+
+        /* 승급/강등 구분선 */
+        .divider {
+            display: flex; align-items: center; justify-content: center; margin: 15px 0; gap: 10px;
+        }
+        .divider-line { height: 1px; background-color: #333; flex-grow: 1; }
+        .divider-text { font-size: 11px; font-weight: 700; color: #CCFF00; letter-spacing: -0.5px; }
+        .divider-text.danger { color: #FF4444; }
+
+        /* 랭킹 아이템 (유저 한 줄) */
+        .rank-item {
+            display: flex; align-items: center; padding: 15px; border-radius: 16px;
+            background-color: #1A1A1A; margin-bottom: 8px; border: 1px solid transparent;
+        }
+        .rank-item.me {
+            background-color: rgba(204, 255, 0, 0.1); border: 1px solid #CCFF00; box-shadow: 0 0 15px rgba(204, 255, 0, 0.1);
+        }
+        
+        .rank-num { font-size: 18px; font-weight: 900; width: 30px; color: #888; font-style: italic; }
+        .rank-item.top3 .rank-num { color: #FFD700; } /* 상위 3명은 금색 숫자 */
+        
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background-color: #333; display: flex; justify-content: center; align-items: center; font-size: 20px; margin-right: 12px; }
+        
+        .user-info { flex-grow: 1; }
+        .user-name { font-size: 15px; font-weight: 700; margin-bottom: 3px; display: flex; align-items: center; gap: 5px;}
+        .user-name.me-text { color: #CCFF00; }
+        .user-stat { font-size: 12px; color: #888; display: flex; gap: 10px; }
+        .stat-highlight { color: #fff; font-weight: 600; }
+
+        /* 상태 아이콘 (어제 대비 순위 변동) */
+        .status-up { color: #CCFF00; font-size: 12px; font-weight: 700; }
+        .status-down { color: #FF4444; font-size: 12px; font-weight: 700; }
+        .status-same { color: #555; font-size: 12px; font-weight: 700; }
+
+        /* 하단 네비게이션 바 (랭킹 탭 활성화) */
+        .bottom-nav {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 85px;
+            background-color: rgba(10, 10, 10, 0.9); backdrop-filter: blur(10px);
+            border-top: 1px solid #222222; display: flex; justify-content: space-around; align-items: center; padding-bottom: 15px; box-sizing: border-box; z-index: 10;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #666666; cursor: pointer; }
+        .nav-item.active { color: #CCFF00; }
+        .nav-icon { font-size: 24px; }
+        .nav-text { font-size: 11px; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="bg-pattern"></div>
+        
+        <div class="header">
+            <div class="page-title">LEADERBOARD</div>
+        </div>
+
+        <div class="tier-banner">
+            <div class="tier-icon">🏆</div>
+            <div class="tier-name">GOLD TIER</div>
+            <div class="tier-info">플래티넘 승급까지 1명 추월 필요 • 2일 남음</div>
+        </div>
+
+        <div class="ranking-container">
+            
+            <div class="rank-item top3">
+                <div class="rank-num">1</div>
+                <div class="user-avatar">🦊</div>
+                <div class="user-info">
+                    <div class="user-name">달리는여우</div>
+                    <div class="user-stat">거리 <span class="stat-highlight">184km</span> | 불꽃 <span class="stat-highlight">🔥 120일</span></div>
+                </div>
+                <div class="status-same">-</div>
+            </div>
+
+            <div class="divider">
+                <div class="divider-line"></div>
+                <div class="divider-text">플래티넘 승급 확정 (상위 2명)</div>
+                <div class="divider-line"></div>
+            </div>
+
+            <div class="rank-item">
+                <div class="rank-num">2</div>
+                <div class="user-avatar">😎</div>
+                <div class="user-info">
+                    <div class="user-name">민수</div>
+                    <div class="user-stat">거리 <span class="stat-highlight">142km</span> | 불꽃 <span class="stat-highlight">🔥 45일</span></div>
+                </div>
+                <div class="status-down">▼ 1</div>
+            </div>
+
+            <div class="rank-item me">
+                <div class="rank-num" style="color: #CCFF00;">3</div>
+                <div class="user-avatar" style="border: 2px solid #CCFF00;">🏃‍♂️</div>
+                <div class="user-info">
+                    <div class="user-name me-text">지독한러너 (나)</div>
+                    <div class="user-stat">거리 <span class="stat-highlight">140km</span> | 불꽃 <span class="stat-highlight">🔥 42일</span></div>
+                </div>
+                <div class="status-up">▲ 2</div>
+            </div>
+
+            <div class="rank-item">
+                <div class="rank-num">4</div>
+                <div class="user-avatar">👻</div>
+                <div class="user-info">
+                    <div class="user-name">고스트러너</div>
+                    <div class="user-stat">거리 <span class="stat-highlight">128km</span> | 불꽃 <span class="stat-highlight">🔥 30일</span></div>
+                </div>
+                <div class="status-down">▼ 1</div>
+            </div>
+
+            <div class="divider">
+                <div class="divider-line"></div>
+                <div class="divider-text danger">실버 강등 위기 (하위 1명)</div>
+                <div class="divider-line"></div>
+            </div>
+
+            <div class="rank-item">
+                <div class="rank-num">5</div>
+                <div class="user-avatar" style="opacity: 0.5;">😴</div>
+                <div class="user-info">
+                    <div class="user-name" style="color: #666;">잠자는토끼</div>
+                    <div class="user-stat">거리 <span class="stat-highlight">12km</span> | 불꽃 <span class="stat-highlight" style="color:#666;">🔥 0일</span></div>
+                </div>
+                <div class="status-down">▼ 2</div>
+            </div>
+
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item">
+                <div class="nav-icon">🏠</div>
+                <span class="nav-text">홈</span>
+            </div>
+            <div class="nav-item active">
+                <div class="nav-icon">🏆</div>
+                <span class="nav-text">랭킹</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">📅</div>
+                <span class="nav-text">기록</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">👤</div>
+                <span class="nav-text">프로필</span>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

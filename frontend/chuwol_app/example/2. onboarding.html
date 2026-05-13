@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHUWOL Onboarding</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+        body {
+            margin: 0; padding: 0; background-color: #000000; color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden;
+        }
+
+        .app-container {
+            width: 393px; height: 852px;
+            background: linear-gradient(180deg, #0A0A0A 0%, #111111 100%);
+            position: relative; display: flex; flex-direction: column; box-sizing: border-box;
+        }
+
+        /* 미세한 왼쪽 사선 패턴 유지 */
+        .bg-pattern {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0.15;
+            background-image: repeating-linear-gradient(-45deg, #444444, #444444 1px, transparent 1px, transparent 8px);
+            pointer-events: none;
+        }
+
+        /* 상단 헤더 텍스트 */
+        .header-section {
+            padding: 70px 24px 30px 24px; position: relative; z-index: 10;
+        }
+        .header-title {
+            font-size: 28px; font-weight: 900; font-style: italic; color: #fff;
+            letter-spacing: -1px; line-height: 1.3; margin-bottom: 8px;
+        }
+        .header-title span { color: #CCFF00; text-shadow: 0 0 15px rgba(204, 255, 0, 0.4); }
+        .header-sub { font-size: 14px; color: #888; font-weight: 600; }
+
+        /* 입력 폼 컨테이너 */
+        .form-section {
+            padding: 0 24px; flex-grow: 1; display: flex; flex-direction: column; gap: 30px; position: relative; z-index: 10;
+            overflow-y: auto;
+        }
+
+        .input-group { display: flex; flex-direction: column; gap: 10px; }
+        .input-label { font-size: 14px; font-weight: 700; color: #fff; }
+
+        /* 1. 닉네임 입력칸 */
+        .input-field {
+            width: 100%; height: 56px; background-color: #1A1A1A; border: 1px solid #333;
+            border-radius: 12px; padding: 0 16px; color: #fff; font-size: 16px; font-weight: 600;
+            box-sizing: border-box; outline: none; transition: 0.2s; font-family: 'Inter', sans-serif;
+        }
+        .input-field:focus { border-color: #CCFF00; box-shadow: 0 0 10px rgba(204, 255, 0, 0.2); }
+        .input-field::placeholder { color: #555; }
+
+        /* 2. 아바타 선택 (가로 스크롤 느낌) */
+        .avatar-list {
+            display: flex; gap: 12px;
+        }
+        .avatar-item {
+            width: 60px; height: 60px; border-radius: 50%; background-color: #1A1A1A; border: 2px solid #333;
+            display: flex; justify-content: center; align-items: center; font-size: 28px; cursor: pointer; transition: 0.2s;
+        }
+        /* 선택된 아바타 스타일 */
+        .avatar-item.active {
+            border-color: #CCFF00; background-color: rgba(204, 255, 0, 0.1);
+            transform: translateY(-5px); box-shadow: 0 5px 15px rgba(204, 255, 0, 0.3);
+        }
+
+        /* 3. 러닝 레벨 선택 (카드형) */
+        .level-list { display: flex; flex-direction: column; gap: 10px; }
+        .level-card {
+            background-color: #1A1A1A; border: 1px solid #333; border-radius: 12px; padding: 16px;
+            display: flex; align-items: center; cursor: pointer; transition: 0.2s;
+        }
+        .level-card.active {
+            border-color: #CCFF00; background-color: rgba(204, 255, 0, 0.05);
+        }
+        .level-icon { font-size: 24px; margin-right: 15px; width: 30px; text-align: center; }
+        .level-info { display: flex; flex-direction: column; gap: 2px; }
+        .level-title { font-size: 15px; font-weight: 700; color: #fff; }
+        .level-desc { font-size: 12px; font-weight: 600; color: #888; }
+        .level-card.active .level-title { color: #CCFF00; }
+
+        /* 하단 완료 버튼 */
+        .action-section {
+            padding: 20px 24px 40px 24px; position: relative; z-index: 10;
+        }
+        .btn-submit {
+            width: 100%; height: 64px; border-radius: 16px; background-color: #CCFF00; color: #000;
+            display: flex; justify-content: center; align-items: center; font-size: 18px; font-weight: 900; font-style: italic;
+            cursor: pointer; border: none; box-shadow: 0 8px 20px rgba(204, 255, 0, 0.4); transition: 0.2s;
+        }
+        .btn-submit:active { transform: translateY(2px); box-shadow: 0 4px 10px rgba(204, 255, 0, 0.4); }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="bg-pattern"></div>
+        
+        <div class="header-section">
+            <div class="header-title">러너님, 환영합니다!<br><span>추월 준비</span>를 해볼까요?</div>
+            <div class="header-sub">프로필을 완성하고 나만의 타겟을 배정받으세요.</div>
+        </div>
+
+        <div class="form-section">
+            <div class="input-group">
+                <div class="input-label">사용할 닉네임</div>
+                <input type="text" class="input-field" placeholder="최대 8자 입력 (예: 지독한러너)">
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">나만의 캐릭터</div>
+                <div class="avatar-list">
+                    <div class="avatar-item active">🏃‍♂️</div> <div class="avatar-item">🦊</div>
+                    <div class="avatar-item">😎</div>
+                    <div class="avatar-item">👻</div>
+                    <div class="avatar-item">👽</div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">현재 러닝 레벨</div>
+                <div class="level-list">
+                    <div class="level-card">
+                        <div class="level-icon">🚶‍♂️</div>
+                        <div class="level-info">
+                            <div class="level-title">입문자 (Walk & Run)</div>
+                            <div class="level-desc">이제 막 걷고 뛰기를 시작했어요.</div>
+                        </div>
+                    </div>
+                    <div class="level-card active">
+                        <div class="level-icon">🏃‍♂️</div>
+                        <div class="level-info">
+                            <div class="level-title">러너 (3km ~ 5km)</div>
+                            <div class="level-desc">쉬지 않고 3km 이상 뛸 수 있어요.</div>
+                        </div>
+                    </div>
+                    <div class="level-card">
+                        <div class="level-icon">🔥</div>
+                        <div class="level-info">
+                            <div class="level-title">마스터 (10km 이상)</div>
+                            <div class="level-desc">기록 단축과 장거리를 즐깁니다.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-section">
+            <button class="btn-submit">설정 완료하고 타겟 찾기 💨</button>
+        </div>
+
+    </div>
+</body>
+</html>
